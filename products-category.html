@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container" style="margin-top: 2em">
+
+        <!-- Search product input -->
+        <div class="mb-3">
+            <form id="searchForm" action="/products/search" method="get" class="form-inline my-2 my-lg-0">
+                <div style="display: flex; justify-content: center;">    
+                    <input
+                    id="searchedData"
+                    class="form-control mr-sm-2 mb-2 mt-2 mx-3"
+                    type="search"
+                    placeholder="Search Product"
+                    aria-label="Search"
+                    name="productSearch"
+                    />
+                    <button
+                    class="btn btn-outline-primary my-1 my-sm-2 mx-3"
+                    type="submit"
+                    >
+                    Search
+                    </button>
+                </div>
+            </form>
+        </div>
+        <!-- End search product input -->
+
+        <!-- Dropdown for categories -->
+        <div class="mb-3" style="display: flex; justify-content: center;">
+            <select class="form-select" style="max-width: 30em; " id="categorySelect" onchange="navigateToCategory(this);">
+                
+            </select>
+        </div>
+
+
+        <div style="display: flex;">
+            <div style="flex-grow: 1;"><h3 style="margin-bottom: 1em">Products</h3></div>
+            <div style="justify-content: flex-end;"><button class="btn btn-primary" onclick="window.location.href='/categories'" >Back to Categories</button></div>
+            <div style="justify-content: flex-end; margin-left: 1em;"><button onclick="window.history.back()" class="btn btn-outline-primary"> Back</button></div>
+        </div>
+        <!-- Products Table -->
+        <table border="1" id="products-table" class="table table-striped">
+            <thead style="background-color: black; color: white">
+                <tr>
+                    <th scope="col">Product ID</th>
+                    <th scope="col">Product Name</th>
+                    <th scope="col">Brand</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Discounted Price</th>
+                    <th scope="col">Created Date</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <!-- Pagination -->
+        <div class="container">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                </ul>
+            </nav>
+        </div>
+        <!-- End Pagination -->
+    </div>
+
+    <script>
+        // Function to fetch data from the endpoint URL
+        async function fetchData() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const categoryId = window.location.pathname.split('/').pop();
+                const page = urlParams.get('page') || 1; // Get the page number from URL parameters, default to 1 if not provided
+                const response = await fetch(`/api/product/${categoryId}?page=${page}`);
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+    
+        // Function to render category options in dropdown
+        async function renderCategoryOptions(categories) {
+            const select = document.getElementById('categorySelect');
+            const data = await fetchData('/api/product/:cat_id'); // Fetch categories
+            const selectedCategoryId = select.value; // Preserve the selected category ID
+
+            // Clear existing options only if categories are available
+            if (data.categories.length > 0) {
+                select.innerHTML = '<option value="">Select a category</option>';
+            }
+
+            data.categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.cat_id;
+                option.textContent = category.cat_name;
+                if (category.cat_id === selectedCategoryId) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            });
+            select.innerHTML += '<option value="all-products">All Categories</option>';
+        }
+
+
+        // Function to render category options in dropdown
+        async function renderCategoryOptions(categories) {
+            const select = document.getElementById('categorySelect');
+            const data = await fetchData('/api/categories'); // Fetch categories
+
+            // Clear existing options
+            select.innerHTML = '';
+
+            // Add default option
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Select a category';
+            select.appendChild(defaultOption);
+
+            // Add options for each category
+            data.categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.cat_id;
+                option.textContent = category.cat_name;
+                select.appendChild(option);
+            });
+
+            select.innerHTML+="<option value='all-products'>All Products</option>";
+        }
+
+        // Function to handle navigation to a category
+        function navigateToCategory(select) {
+            const selectedOption = select.options[select.selectedIndex];
+            const categoryId = selectedOption.value;
+            if (categoryId) { // Check if a category is selected
+                window.location.href = `/product/${categoryId}`;
+            }
+        }
+
+    
+        // Function to render products table
+        function renderProducts(products) {
+            const tbody = document.querySelector('#products-table tbody');
+            tbody.innerHTML = '';
+            products.forEach(product => {
+                const row = `
+                    <tr>
+                        <td>${product.prod_id}</td>
+                        <td>${product.prod_name}</td>
+                        <td>${product.prod_brand}</td>
+                        <td>${product.price}</td>
+                        <td>${product.discounted_price}</td>
+                        <td>${new Date(product.created_date).toLocaleDateString()}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+    
+        // Function to render pagination
+        function renderPagination(totalPages, categoryId, currentPage) {
+            const paginationContainer = document.querySelector('.pagination');
+            paginationContainer.innerHTML = '';
+
+            // Add previous page link
+            if (currentPage > 1) {
+                paginationContainer.innerHTML += `<li class="page-item"><a class="page-link" href="#" onclick="navigateToPage(${currentPage - 1}, '${categoryId}'); return false;">Previous</a></li>`;
+            }
+
+            // Add individual page links
+            for (let i = 1; i <= totalPages; i++) {
+                paginationContainer.innerHTML += `<li class="page-item ${currentPage === i ? 'active' : ''}"><a class="page-link" href="#" onclick="navigateToPage(${i}, '${categoryId}'); return false;">${i}</a></li>`;
+            }
+
+            // Add next page link
+            if (currentPage < totalPages) {
+                paginationContainer.innerHTML += `<li class="page-item"><a class="page-link" href="#" onclick="navigateToPage(${currentPage + 1}, '${categoryId}'); return false;">Next</a></li>`;
+            }
+        }
+
+        // Function to handle navigation to a specific page
+        function navigateToPage(pageNumber, categoryId) {
+            window.history.pushState({}, '', `/product/${categoryId}?page=${pageNumber}`);
+            onPageLoad(); // Reload the page content
+        }
+
+
+    
+        // Function to handle page load
+        async function onPageLoad() {
+            const { products, categories, currentPage, categoryId, totalPages } = await fetchData();
+            renderProducts(products);
+            renderPagination(totalPages, categoryId, currentPage);
+            renderCategoryOptions(categories);
+        }
+    
+        // Function to handle navigation to a category
+        function navigateToCategory(select) {
+            const selectedOption = select.options[select.selectedIndex];
+            const categoryId = selectedOption.value;
+            if (categoryId == "all-products") {
+                window.location.href = "/all-products";
+            } else {
+                window.location.href = `/product/${categoryId}`;
+            }
+        }
+
+    
+        // Call onPageLoad when the page is loaded
+        window.onload = onPageLoad;
+    </script>
+    
+</body>
+</html>

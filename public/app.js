@@ -1,16 +1,26 @@
+// app.js
 const express = require('express');
 const mysql = require('mysql');
 const app = express();
 const {Client} = require("@elastic/elasticsearch");
 
-const esClient = new Client({node:"http://localhost:9200"});
+const esClient = new Client({
+  cloud: {
+    id: "4854822fc0674d59a3533089c656d94b:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvOjQ0MyRlN2JiYTE2ODBiNTk0ZmVkOTViYWM3MmY5ZDU0MjA0NSQ2ZmNjMjgyZTk5YWU0M2Q5OGIxZjk4YmVjOThlYjY3NA=="
+  },
+  auth: {
+    username: 'elastic',
+    password: 'EfbPdu0k6rpvevG2umcksu9j'
+  }
+});
 
 // Create connection to MySQL database
+
 const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root', // Assuming root user. Change if necessary.
-    password: 'www.UV@14.com', // Change to your MySQL password
-    database: 'ecommerce'
+  host: "sql6.freesqldatabase.com",
+  user: "sql6685546",
+  password: "eugifeb7jt",
+  database: "sql6685546",
 });
 
 // Connect to the database
@@ -169,7 +179,7 @@ app.get("/api/products/search", async (req, res) => {
   
     try {
       let response = await esClient.search({
-        index: "index-product",
+        index: "index-products",
         body: {
           query: {
             bool: {

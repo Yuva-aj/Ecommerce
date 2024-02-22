@@ -17,7 +17,7 @@
                 <div style="display: flex; justify-content: center;">    
                     <input
                     id="searchedData"
-                    class="form-control mr-sm-2 mb-2 mt-2 mx-3"
+                    class="form-control mr-sm-2 mb-2 mt-2 mx-2"
                     type="search"
                     placeholder="Search Product"
                     aria-label="Search"
@@ -36,13 +36,14 @@
 
         <div style="display: flex;">
             <div style="flex-grow: 1;"><h3 style="margin-bottom: 1em">Search Results</h3></div>
-            <div style="justify-content: flex-end;"><button class="btn btn-primary" onclick="window.location.href='/categories'" >Back to Categories</button></div>
+            <div style="justify-content: flex-end;"><button class="btn btn-primary" onclick="window.location.href='/all-products'" >All Products</button></div>
+            <div style="justify-content: flex-end; margin-left: 1em;"><button class="btn btn-primary" onclick="window.location.href='/categories'" >Back to Categories</button></div>
             <div style="justify-content: flex-end; margin-left: 1em;"><button onclick="window.history.back()" class="btn btn-outline-primary"> Back</button></div>
         </div>
 
         <!-- Display search results -->
         <table border="1" id="products-table" class="table table-striped">
-            <thead style="background-color: black; color: white">
+            <thead style="background-color: rgb(58, 58, 58);; color: white">
                 <tr>
                     <th scope="col">Product ID</th>
                     <th scope="col">Product Name</th>
@@ -74,8 +75,8 @@
         // Function to render products
         async function renderProducts() {
             const searchParams = new URLSearchParams(window.location.search);
-            const categorySearch = searchParams.get('productSearch');
-            const url = `/api/products/search?productSearch=${categorySearch}`;
+            const productSearch = searchParams.get('productSearch');
+            const url = `/api/products/search?productSearch=${productSearch}`;
             const { results } = await fetchData(url);
             const tbody = document.getElementById('products-body');
             tbody.innerHTML = '';

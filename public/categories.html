@@ -13,14 +13,14 @@
             <div style="display: flex; justify-content: center;">    
                 <input
                 id="searchedData" 
-                class="form-control mr-sm-2 mb-2 mt-2 mx-3"
+                class="form-control mr-sm-2 mb-2 mt-2 mx-2"
                 type="search"
                 placeholder="Search Product"
                 aria-label="Search"
                 name="productSearch"
                 />
                 <button
-                class="btn btn-outline-primary my-1 my-sm-2 mx-3"
+                class="btn btn-outline-primary my-1 my-sm-2 mx-2"
                 type="submit"
                 >
                 Search
@@ -36,7 +36,7 @@
     </div>
         <!-- Categories Table -->
         <table border="1" id="categories-table" class="table table-striped">
-            <thead style="background-color: black; color: white">
+            <thead style="background-color: rgb(58, 58, 58); color: white">
                 <tr>
                     <th scope="col">Category ID</th>
                     <th scope="col">Category Name</th>
@@ -85,7 +85,7 @@
           const row = `
                 <tr>
                     <td>${category.cat_id}</td>
-                    <td><a href="/product/${category.cat_id}">${category.cat_name}</a></td>
+                    <td><a style="text-decoration: none;" href="/product/${category.cat_id}">${category.cat_name}</a></td>
                     <td>${category.stock_count}</td>
                     <td>${new Date(category.created_date).toLocaleDateString()}</td>
                 </tr>
